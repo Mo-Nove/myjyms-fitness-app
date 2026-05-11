@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyJyms | Dein KI-Personal Trainer</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>MyJyms</h1>
+        <button id="darkModeBtn">🌙 Dark Mode</button>
+    </header>
+
+    <div class="container">
+        
+        <div class="main-column">
+            
+            <div class="card">
+                <h2>1. Dein Profil (Wochenplan generieren)</h2>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div style="flex: 1; min-width: 150px;">
+                        <label>Username</label>
+                        <input type="text" id="inputUsername" placeholder="Wie soll ich dich nennen?">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label>Geschlecht</label>
+                        <select id="inputGeschlecht">
+                            <option value="männlich">Männlich</option>
+                            <option value="weiblich">Weiblich</option>
+                            <option value="divers">Divers</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label>Fitnesslevel</label>
+                        <select id="inputFitness">
+                            <option value="Anfänger">Anfänger</option>
+                            <option value="Fortgeschritten">Fortgeschritten</option>
+                            <option value="Profi">Profi</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px;">
+                    <div style="flex: 1;">
+                        <label>Alter</label>
+                        <input type="number" id="inputAlter" placeholder="z.B. 21">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Gewicht (kg)</label>
+                        <input type="number" id="inputGewicht" placeholder="z.B. 80">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Größe (cm)</label>
+                        <input type="number" id="inputGroesse" placeholder="z.B. 180">
+                    </div>
+                </div>
+
+                <label style="display: block; margin-top: 15px;">Dein Hauptziel</label>
+                <input type="text" id="inputZiel" placeholder="z.B. Muskelaufbau...">
+                
+                <button class="primary-btn" id="btnGeneratePlan">Erstelle meinen perfekten Wochenplan</button>
+            </div>
+
+            <div class="card">
+                <h2>2. Chatte mit deinem Coach</h2>
+                
+                <div id="chatBox">
+                    <div class="chat-msg msg-ai">Hallo! Ich bin dein MyJyms KI-Coach. Lass uns deinen Traumkörper aufbauen. Wie kann ich dir helfen?</div>
+                </div>
+                
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Frage mich etwas zu Ernährung, Übungen...">
+                    <button id="btnSendChat">
+                        <svg viewBox="0 0 24 24" class="send-icon">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="side-column">
+            <div class="card" style="text-align: center;">
+                <h3>Schnellwahl (Muskelfokus)</h3>
+                <p style="font-size: 0.9em; color: gray;">Klicke auf einen Muskel, um direkt Übungen im Chat zu erhalten.</p>
+                
+                <svg viewBox="0 0 200 400" width="100%" height="300" style="margin-top: 20px;">
+                    
+                    <circle cx="100" cy="50" r="30" class="head-circle"/>
+                    <path id="m-arms-left" class="muscle" d="M 30 90 L 55 90 L 45 200 L 20 200 Z" />
+                    <path id="m-arms-right" class="muscle" d="M 145 90 L 170 90 L 180 200 L 155 200 Z" />
+                    <path id="m-chest" class="muscle" d="M 60 90 L 140 90 L 130 150 L 70 150 Z" />
+                    <rect id="m-abs" class="muscle" x="75" y="155" width="50" height="70" rx="5" />
+                    <path id="m-legs" class="muscle" d="M 70 230 L 95 230 L 95 380 L 65 380 Z" />
+                    <path id="m-legs2" class="muscle" d="M 105 230 L 130 230 L 135 380 L 105 380 Z" />
+                    
+                </svg>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muscle-AI Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; max-width: 600px; margin: 0 auto; }
+        .card { background: white; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; margin-top: 5px; width: 100%; box-sizing: border-box; }
+        button { background-color: #0984e3; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #74b9ff; }
+        #output { background: #2d3436; color: #00b894; padding: 15px; border-radius: 5px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <h1>⚙️ Muscle-AI API Tester</h1>
+    <p>Hier testen wir alle HTTP-Methoden (Requirement M7).</p>
+    <div class="card" style="border: 2px solid #00b894;">
+        <h3>🔒 Login (M9: Session Management)</h3>
+        <input type="text" id="inputUsername" placeholder="Benutzername (Tipp: admin)">
+        <input type="password" id="inputPassword" placeholder="Passwort (Tipp: 1234)">
+        <button id="btnLogin" style="background-color: #00b894;">Einloggen & Token holen</button>
+        <p id="loginStatus" style="font-size: 0.9em; margin-top: 10px;"></p>
+    </div>
+
+    <div class="card">
+        <h3>1. Übungen laden (GET)</h3>
+        <button id="btnGet">Alle Brustübungen holen</button>
+    </div>
+
+    <div class="card">
+        <h3>2. Neuen Trainingsplan erstellen (POST)</h3>
+        <input type="text" id="inputPost" placeholder="Dein Ziel (z. B. Muskelaufbau)">
+        <button id="btnPost">Plan generieren</button>
+    </div>
+
+    <div class="card">
+        <h3>3. Profil aktualisieren (PUT)</h3>
+        <input type="text" id="inputPut" placeholder="Dein neues Gewicht in kg">
+        <button id="btnPut">Profil speichern</button>
+    </div>
+
+    <div class="card">
+        <h3>4. Trainingsplan löschen (DELETE)</h3>
+        <input type="text" id="inputDelete" placeholder="Plan ID (z. B. 123)">
+        <button id="btnDelete">Plan löschen</button>
+    </div>
+
+    <h3>Server-Antwort:</h3>
+    <div id="output">Noch keine Anfrage gesendet...</div>
+
+    <script src="app.js"></script>
+</body>
+</html>
