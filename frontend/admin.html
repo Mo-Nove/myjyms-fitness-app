@@ -3,53 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muscle-AI Dashboard</title>
+    <title>MyJyms | Admin Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; max-width: 600px; margin: 0 auto; }
-        .card { background: white; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input, button { padding: 10px; margin-top: 5px; width: 100%; box-sizing: border-box; }
-        button { background-color: #0984e3; color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #74b9ff; }
-        #output { background: #2d3436; color: #00b894; padding: 15px; border-radius: 5px; font-family: monospace; }
+        :root {
+            --primary: #e99623;
+            --primary-hover: #d4860f;
+            --bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --border: #dfe6e9;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+        body.dark-mode {
+            --bg: #1e1e24;
+            --card-bg: #2b2b36;
+            --text: #f5f6fa;
+            --border: #40404f;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        header {
+            background-color: var(--card-bg);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        header h1 { color: var(--primary); font-size: 1.4em; }
+        .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        nav {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+        }
+        .nav-btn {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95em;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover { background-color: var(--bg); }
+        .nav-btn.active { border-bottom-color: var(--primary); color: var(--primary); }
+        main { max-width: 1200px; margin: 25px auto; padding: 0 20px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        .card h2 { margin-bottom: 15px; color: var(--primary); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-weight: bold; background-color: rgba(0,0,0,0.03); }
+        body.dark-mode th { background-color: rgba(255,255,255,0.03); }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        .btn-primary { background-color: var(--primary); color: #fff; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-danger { background-color: var(--danger); color: #fff; }
+        .btn-danger:hover { opacity: 0.8; }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--text);
+            border-radius: 20px;
+        }
+        .btn-outline:hover { background-color: var(--primary); color: #1e1e24; }
+        .btn-logout {
+            background: transparent;
+            border: 2px solid var(--danger);
+            color: var(--danger);
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { background-color: var(--danger); color: #fff; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(233, 150, 35, 0.15);
+        }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+        select:hover { border-color: var(--primary); }
+        label { font-weight: bold; font-size: 0.9em; display: block; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        .format-toggle { display: flex; align-items: center; gap: 8px; font-size: 0.9em; }
+        .format-toggle select { width: auto; margin: 0; padding: 6px 32px 6px 10px; }
+        .raw-output {
+            background: #1e1e24;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+        .status-msg { padding: 10px; border-radius: 6px; margin-top: 10px; font-weight: bold; }
+        .status-success { background-color: #d1fae5; color: #065f46; }
+        .status-error { background-color: #fee2e2; color: #991b1b; }
+        body.dark-mode .status-success { background-color: #064e3b; color: #a7f3d0; }
+        body.dark-mode .status-error { background-color: #7f1d1d; color: #fecaca; }
+        .admin-login {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-card { max-width: 360px; width: 100%; }
+        .login-card h2 { text-align: center; }
+        .api-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        @media (max-width: 600px) {
+            header { padding: 10px 15px; }
+            header h1 { font-size: 1.1em; }
+            .nav-btn { padding: 10px 14px; font-size: 0.85em; }
+            main { padding: 0 10px; margin: 15px auto; }
+            .card { padding: 15px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .api-cards { grid-template-columns: 1fr; }
+            table { font-size: 0.85em; overflow-x: auto; display: block; }
+            th, td { padding: 6px 8px; white-space: nowrap; }
+        }
     </style>
 </head>
 <body>
-
-    <h1>⚙️ Muscle-AI API Tester</h1>
-    <p>Hier testen wir alle HTTP-Methoden (Requirement M7).</p>
-    <div class="card" style="border: 2px solid #00b894;">
-        <h3>🔒 Login (M9: Session Management)</h3>
-        <input type="text" id="inputUsername" placeholder="Benutzername (Tipp: admin)">
-        <input type="password" id="inputPassword" placeholder="Passwort (Tipp: 1234)">
-        <button id="btnLogin" style="background-color: #00b894;">Einloggen & Token holen</button>
-        <p id="loginStatus" style="font-size: 0.9em; margin-top: 10px;"></p>
+    <!-- LOGIN VIEW -->
+    <div id="loginView" class="admin-login">
+        <div class="card login-card">
+            <h2>Admin Login</h2>
+            <p style="text-align:center; margin-bottom:15px; color:gray;">Zugang nur für Administratoren</p>
+            <label for="adminUser">Benutzername</label>
+            <input type="text" id="adminUser" placeholder="admin">
+            <label for="adminPass">Passwort</label>
+            <input type="password" id="adminPass" placeholder="••••">
+            <button class="btn btn-primary" id="btnAdminLogin" style="width:100%; padding:12px; margin-top:5px;">Einloggen</button>
+            <div id="loginMsg"></div>
+        </div>
     </div>
 
-    <div class="card">
-        <h3>1. Übungen laden (GET)</h3>
-        <button id="btnGet">Alle Brustübungen holen</button>
-    </div>
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboardView" style="display:none;">
+        <header>
+            <h1>MyJyms Admin</h1>
+            <div class="header-actions">
+                <div class="format-toggle">
+                    <label for="formatSelect">Format:</label>
+                    <select id="formatSelect">
+                        <option value="json" selected>JSON</option>
+                        <option value="xml">XML</option>
+                    </select>
+                </div>
+                <button class="btn-outline" id="btnDarkMode">🌙</button>
+                <button class="btn-logout" id="btnAdminLogout">Logout</button>
+            </div>
+        </header>
 
-    <div class="card">
-        <h3>2. Neuen Trainingsplan erstellen (POST)</h3>
-        <input type="text" id="inputPost" placeholder="Dein Ziel (z. B. Muskelaufbau)">
-        <button id="btnPost">Plan generieren</button>
-    </div>
+        <nav>
+            <button class="nav-btn active" data-section="users">Users</button>
+            <button class="nav-btn" data-section="plans">Pläne</button>
+            <button class="nav-btn" data-section="exercises">Übungen</button>
+            <button class="nav-btn" data-section="apis">Externe APIs</button>
+        </nav>
 
-    <div class="card">
-        <h3>3. Profil aktualisieren (PUT)</h3>
-        <input type="text" id="inputPut" placeholder="Dein neues Gewicht in kg">
-        <button id="btnPut">Profil speichern</button>
-    </div>
+        <main>
+            <!-- USERS SECTION -->
+            <section id="sectionUsers" class="section active">
+                <div class="card">
+                    <h2>Benutzerverwaltung</h2>
+                    <button class="btn btn-primary" id="btnLoadUsers">Users laden (GET)</button>
+                    <div id="usersTable"></div>
+                    <div id="usersRaw" class="raw-output" style="display:none;"></div>
+                </div>
+                <div class="card">
+                    <h2>User aktualisieren (PATCH)</h2>
+                    <div class="form-grid">
+                        <div>
+                            <label for="patchUserId">User ID</label>
+                            <input type="number" id="patchUserId" value="1">
+                        </div>
+                        <div>
+                            <label for="patchUsername">Username</label>
+                            <input type="text" id="patchUsername" placeholder="neuer Name">
+                        </div>
+                        <div>
+                            <label for="patchGewicht">Gewicht (kg)</label>
+                            <input type="number" id="patchGewicht" placeholder="z.B. 85">
+                        </div>
+                        <div>
+                            <label for="patchGroesse">Groesse (cm)</label>
+                            <input type="number" id="patchGroesse" placeholder="z.B. 180">
+                        </div>
+                        <div>
+                            <label for="patchAlter">Alter</label>
+                            <input type="number" id="patchAlter" placeholder="z.B. 25">
+                        </div>
+                        <div>
+                            <label for="patchFitness">Level</label>
+                            <select id="patchFitness">
+                                <option value="">-- nicht aendern --</option>
+                                <option value="Anfänger">Anfaenger</option>
+                                <option value="Fortgeschritten">Fortgeschritten</option>
+                                <option value="Profi">Profi</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="patchRole">Rolle</label>
+                            <select id="patchRole">
+                                <option value="">-- nicht aendern --</option>
+                                <option value="user">user</option>
+                                <option value="admin">admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="btnPatchUser" style="margin-top:10px;">PATCH absenden</button>
+                    <div id="patchResult"></div>
+                </div>
+                <div class="card">
+                    <h2>Neuen User erstellen (POST)</h2>
+                    <div class="form-grid">
+                        <div>
+                            <label for="newUsername">Username *</label>
+                            <input type="text" id="newUsername" placeholder="Benutzername">
+                        </div>
+                        <div>
+                            <label for="newPassword">Passwort *</label>
+                            <input type="password" id="newPassword" placeholder="Passwort">
+                        </div>
+                        <div>
+                            <label for="newRole">Rolle</label>
+                            <select id="newRole">
+                                <option value="user" selected>user</option>
+                                <option value="admin">admin</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="newGewicht">Gewicht (kg)</label>
+                            <input type="number" id="newGewicht" placeholder="z.B. 75">
+                        </div>
+                        <div>
+                            <label for="newGroesse">Groesse (cm)</label>
+                            <input type="number" id="newGroesse" placeholder="z.B. 175">
+                        </div>
+                        <div>
+                            <label for="newAlter">Alter</label>
+                            <input type="number" id="newAlter" placeholder="z.B. 22">
+                        </div>
+                        <div>
+                            <label for="newFitness">Level</label>
+                            <select id="newFitness">
+                                <option value="">-- optional --</option>
+                                <option value="Anfänger">Anfaenger</option>
+                                <option value="Fortgeschritten">Fortgeschritten</option>
+                                <option value="Profi">Profi</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="btnCreateUser" style="margin-top:10px;">User erstellen</button>
+                    <div id="createResult"></div>
+                </div>
+            </section>
 
-    <div class="card">
-        <h3>4. Trainingsplan löschen (DELETE)</h3>
-        <input type="text" id="inputDelete" placeholder="Plan ID (z. B. 123)">
-        <button id="btnDelete">Plan löschen</button>
-    </div>
+            <!-- PLANS SECTION -->
+            <section id="sectionPlans" class="section">
+                <div class="card">
+                    <h2>Trainingspläne</h2>
+                    <button class="btn btn-primary" id="btnLoadPlans">Pläne laden (GET)</button>
+                    <div id="plansTable"></div>
+                    <div id="plansRaw" class="raw-output" style="display:none;"></div>
+                </div>
+            </section>
 
-    <h3>Server-Antwort:</h3>
-    <div id="output">Noch keine Anfrage gesendet...</div>
+            <!-- EXERCISES SECTION -->
+            <section id="sectionExercises" class="section">
+                <div class="card">
+                    <h2>Interne Übungen</h2>
+                    <button class="btn btn-primary" id="btnLoadExercises">Übungen laden (GET)</button>
+                    <div id="exercisesTable"></div>
+                </div>
+            </section>
+
+            <!-- EXTERNAL APIS SECTION -->
+            <section id="sectionApis" class="section">
+                <div class="api-cards">
+                    <div class="card">
+                        <h2>wger.de (API 2)</h2>
+                        <p>Übungsdatenbank aus dem wger.de REST-Service.</p>
+                        <button class="btn btn-primary" id="btnLoadExternal">Externe Übungen laden</button>
+                        <div id="externalResult" class="raw-output" style="display:none;"></div>
+                    </div>
+                    <div class="card">
+                        <h2>Open-Meteo (API 3)</h2>
+                        <p>Wetterdaten für Outdoor-Training Empfehlungen.</p>
+                        <button class="btn btn-primary" id="btnLoadWeather">Wetter laden</button>
+                        <div id="weatherResult" class="raw-output" style="display:none;"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <script src="app.js"></script>
 </body>

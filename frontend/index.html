@@ -3,12 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e99623">
     <title>MyJyms | Dein KI-Personal Trainer</title>
 
     <link rel="stylesheet" href="style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body>
@@ -16,7 +18,7 @@
         <div class="login-box" style="position: relative;"> <button id="loginDarkModeBtn"
                 class="login-dark-toggle">🌙</button>
 
-            <h2 class="login-title">🏋️ MyJyms Login</h2>
+            <h2 class="login-title">MyJyms Login</h2>
 
             <label class="login-label">Benutzername</label>
             <input type="text" id="loginUsername" class="login-input" placeholder="admin">
@@ -32,10 +34,10 @@
     </div>
 
     <header>
-        <h1>🏋️ MyJyms</h1>
-        <div style="display: flex; gap: 10px;">
-            <button id="darkModeBtn">🌙 Dark Mode</button>
-            <button id="logoutBtn" class="logout-btn">🚪 Logout</button>
+        <h1>MyJyms</h1>
+        <div class="header-right">
+            <button id="darkModeBtn">🌙 Mode</button>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
         </div>
     </header>
 
@@ -46,21 +48,21 @@
             <div class="card">
                 <h2>1. Dein Profil (Wochenplan generieren)</h2>
 
-                <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-                    <div style="flex: 1; min-width: 150px;">
-                        <label>Username</label>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="inputUsername">Username</label>
                         <input type="text" id="inputUsername" placeholder="Wie soll ich dich nennen?">
                     </div>
-                    <div style="flex: 1; min-width: 150px;">
-                        <label>Geschlecht</label>
+                    <div class="form-field">
+                        <label for="inputGeschlecht">Geschlecht</label>
                         <select id="inputGeschlecht">
                             <option value="männlich">Männlich</option>
                             <option value="weiblich">Weiblich</option>
                             <option value="divers">Divers</option>
                         </select>
                     </div>
-                    <div style="flex: 1; min-width: 150px;">
-                        <label>Fitnesslevel</label>
+                    <div class="form-field">
+                        <label for="inputFitness">Fitnesslevel</label>
                         <select id="inputFitness">
                             <option value="Anfänger">Anfänger</option>
                             <option value="Fortgeschritten">Fortgeschritten</option>
@@ -69,73 +71,195 @@
                     </div>
                 </div>
 
-                <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px;">
-                    <div style="flex: 1;">
-                        <label>Alter</label>
+                <div class="form-row form-row-mt">
+                    <div class="form-field">
+                        <label for="inputAlter">Alter</label>
                         <input type="number" id="inputAlter" placeholder="z.B. 21">
                     </div>
-                    <div style="flex: 1;">
-                        <label>Gewicht (kg)</label>
+                    <div class="form-field">
+                        <label for="inputGewicht">Gewicht (kg)</label>
                         <input type="number" id="inputGewicht" placeholder="z.B. 80">
                     </div>
-                    <div style="flex: 1;">
-                        <label>Größe (cm)</label>
+                    <div class="form-field">
+                        <label for="inputGroesse">Größe (cm)</label>
                         <input type="number" id="inputGroesse" placeholder="z.B. 180">
                     </div>
                 </div>
 
-                <label style="display: block; margin-top: 15px;">Dein Hauptziel</label>
+                <label class="block-label" for="inputZiel">Dein Hauptziel</label>
                 <input type="text" id="inputZiel" placeholder="z.B. Muskelaufbau...">
 
+                <div id="bmiDisplay" class="bmi-display"></div>
+
                 <button class="primary-btn" id="btnGeneratePlan">Erstelle meinen perfekten Wochenplan</button>
+                <button class="secondary-btn" id="btnSaveProfile">Profil speichern</button>
             </div>
 
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h2 style="margin: 0;">2. Chatte mit deinem Coach</h2>
-                    <button id="btnClearChat" class="clear-chat-btn">🗑️ Chat leeren</button>
+                <div class="chat-header">
+                    <h2 class="chat-title">2. Chatte mit deinem Coach</h2>
+                    <div class="chat-actions">
+                        <button id="btnExportPdf" class="export-btn" title="Wochenplan als PDF exportieren">PDF</button>
+                        <button id="btnClearChat" class="clear-chat-btn">Chat leeren</button>
+                    </div>
                 </div>
                 <div id="chatBox">
                     <div class="chat-msg msg-ai">Hallo! Ich bin dein MyJyms KI-Coach. Lass uns deinen Traumkörper
                         aufbauen. Wie kann ich dir helfen?</div>
                 </div>
 
-                <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Frage mich etwas zu Ernährung, Übungen...">
-                    <button id="btnSendChat">
-                        <svg viewBox="0 0 24 24" class="send-icon">
-                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                        </svg>
-                    </button>
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chatInput" placeholder="MyJyms fragen...">
+                    <div class="chat-input-actions">
+                        <div class="model-dropdown" id="modelDropdown">
+                            <button type="button" class="model-pill" id="modelPillBtn">
+                                <span id="modelPillLabel">Flash</span>
+                                <svg width="10" height="6" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="currentColor"/></svg>
+                            </button>
+                            <div class="model-popup" id="modelPopup">
+                                <div class="model-popup-list" id="modelPopupList"></div>
+                            </div>
+                        </div>
+                        <button id="btnSendChat" class="send-btn">
+                            <svg viewBox="0 0 24 24" class="send-icon">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
         </div>
 
         <div class="side-column">
-            <div class="card" style="text-align: center;">
+            <div class="card weather-card">
+                <h3>Outdoor-Training?</h3>
+                <div class="weather-select-row">
+                    <label for="weatherRegion">Bundesland:</label>
+                    <select id="weatherRegion">
+                        <option value="48.2085,16.3721">Wien</option>
+                        <option value="47.07,15.44">Steiermark (Graz)</option>
+                        <option value="47.26,11.39">Tirol (Innsbruck)</option>
+                        <option value="47.80,13.04">Salzburg</option>
+                        <option value="48.30,14.29">Oberösterreich (Linz)</option>
+                        <option value="46.62,14.31">Kärnten (Klagenfurt)</option>
+                        <option value="47.50,9.75">Vorarlberg (Bregenz)</option>
+                        <option value="48.19,15.63">Niederösterreich (St. Pölten)</option>
+                        <option value="47.84,16.25">Burgenland (Eisenstadt)</option>
+                    </select>
+                </div>
+                <div id="weatherInfo">
+                    <p>Lade Wetterdaten...</p>
+                </div>
+            </div>
+
+            <div class="card muscle-card">
                 <h3>Schnellwahl (Muskelfokus)</h3>
-                <p style="font-size: 0.9em; color: gray;">Klicke auf einen Muskel, um direkt Übungen im Chat zu
-                    erhalten.</p>
+                <p class="hint-text">Klicke auf einen Muskel, um direkt Übungen im Chat zu erhalten.</p>
 
-                <svg viewBox="0 0 200 400" width="100%" height="300" style="margin-top: 20px;">
+                <div class="muscle-flip-container">
+                    <button id="btnFlipMuscle" class="flip-btn">Rückseite</button>
+                    <div class="muscle-flipper" id="muscleCard">
+                        <!-- FRONT -->
+                        <div class="muscle-front">
+                            <svg viewBox="0 0 200 400" width="100%" height="300" class="muscle-svg">
+                                <circle id="m-head-front" cx="100" cy="50" r="30" class="head-circle muscle" />
+                                <title>Kopf / Denkübungen</title>
+                                <!-- Gesicht: Augen + Lächeln -->
+                                <circle cx="90" cy="44" r="3" fill="var(--text)" pointer-events="none" />
+                                <circle cx="110" cy="44" r="3" fill="var(--text)" pointer-events="none" />
+                                <path d="M 90 58 Q 100 66 110 58" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" pointer-events="none" />
+                                <path id="m-arms-left" class="muscle" d="M 30 90 L 55 90 L 45 200 L 20 200 Z">
+                                    <title>Bizeps / Arme</title>
+                                </path>
+                                <path id="m-arms-right" class="muscle" d="M 145 90 L 170 90 L 180 200 L 155 200 Z">
+                                    <title>Bizeps / Arme</title>
+                                </path>
+                                <path id="m-chest" class="muscle" d="M 60 90 L 140 90 L 130 150 L 70 150 Z">
+                                    <title>Brust</title>
+                                </path>
+                                <rect id="m-abs" class="muscle" x="75" y="155" width="50" height="70" rx="5">
+                                    <title>Bauch / Core</title>
+                                </rect>
+                                <path id="m-legs" class="muscle" d="M 70 230 L 95 230 L 95 380 L 65 380 Z">
+                                    <title>Beine / Quadrizeps</title>
+                                </path>
+                                <path id="m-legs2" class="muscle" d="M 105 230 L 130 230 L 135 380 L 105 380 Z">
+                                    <title>Beine / Quadrizeps</title>
+                                </path>
+                            </svg>
+                            <p class="muscle-side-label">Vorderseite</p>
+                        </div>
+                        <!-- BACK -->
+                        <div class="muscle-back">
+                            <svg viewBox="0 0 200 400" width="100%" height="300" class="muscle-svg">
+                                <circle id="m-head-back" cx="100" cy="50" r="30" class="head-circle muscle" />
+                                <title>Nacken</title>
+                                <!-- Hinterkopf: kurze Haarstriche -->
+                                <path d="M 80 30 Q 100 22 120 30" fill="none" stroke="var(--text)" stroke-width="2" opacity="0.4" pointer-events="none" />
+                                <path d="M 78 37 Q 100 28 122 37" fill="none" stroke="var(--text)" stroke-width="1.5" opacity="0.3" pointer-events="none" />
+                                <path id="m-back-arms-left" class="muscle" d="M 30 90 L 55 90 L 45 200 L 20 200 Z">
+                                    <title>Trizeps</title>
+                                </path>
+                                <path id="m-back-arms-right" class="muscle" d="M 145 90 L 170 90 L 180 200 L 155 200 Z">
+                                    <title>Trizeps</title>
+                                </path>
+                                <path id="m-upper-back" class="muscle" d="M 60 90 L 140 90 L 135 155 L 65 155 Z">
+                                    <title>Oberer Rücken (Latissimus)</title>
+                                </path>
+                                <path id="m-lower-back" class="muscle" d="M 70 160 L 130 160 L 125 220 L 75 220 Z">
+                                    <title>Unterer Rücken</title>
+                                </path>
+                                <ellipse id="m-glutes" class="muscle" cx="100" cy="240" rx="30" ry="18">
+                                    <title>Po (Glutes)</title>
+                                </ellipse>
+                                <path id="m-hamstrings" class="muscle" d="M 70 262 L 95 262 L 95 380 L 65 380 Z">
+                                    <title>Beinbeuger (Hamstrings)</title>
+                                </path>
+                                <path id="m-hamstrings2" class="muscle" d="M 105 262 L 130 262 L 135 380 L 105 380 Z">
+                                    <title>Beinbeuger (Hamstrings)</title>
+                                </path>
+                            </svg>
+                            <p class="muscle-side-label">Rückseite</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    <circle cx="100" cy="50" r="30" class="head-circle" />
-                    <path id="m-arms-left" class="muscle" d="M 30 90 L 55 90 L 45 200 L 20 200 Z" />
-                    <path id="m-arms-right" class="muscle" d="M 145 90 L 170 90 L 180 200 L 155 200 Z" />
-                    <path id="m-chest" class="muscle" d="M 60 90 L 140 90 L 130 150 L 70 150 Z" />
-                    <rect id="m-abs" class="muscle" x="75" y="155" width="50" height="70" rx="5" />
-                    <path id="m-legs" class="muscle" d="M 70 230 L 95 230 L 95 380 L 65 380 Z" />
-                    <path id="m-legs2" class="muscle" d="M 105 230 L 130 230 L 135 380 L 105 380 Z" />
-
-                </svg>
-
+            <!-- MOTIVATION FISH -->
+            <div class="card fish-card">
+                <h3>Motivationsfisch</h3>
+                <p class="hint-text">Klicke auf den Fisch für einen Motivations-Boost!</p>
+                <div id="fishContainer" class="fish-container">
+                    <svg id="motivationFish" viewBox="0 0 120 60" class="fish-svg">
+                        <path d="M 95 30 C 95 10, 55 0, 30 15 L 5 30 L 30 45 C 55 60, 95 50, 95 30 Z" class="fish-body" />
+                        <circle cx="75" cy="25" r="4" class="fish-eye" />
+                        <path d="M 10 15 L 0 5 L 0 25 Z" class="fish-tail" />
+                        <path d="M 10 45 L 0 55 L 0 35 Z" class="fish-tail" />
+                    </svg>
+                </div>
+                <p id="fishQuote" class="fish-quote"></p>
             </div>
         </div>
 
     </div>
 
-    <script src="main.js"></script>
+    <div id="toastContainer" class="toast-container"></div>
+    <button id="scrollTopBtn" class="scroll-top-btn" title="Nach oben">↑</button>
+
+    <!--
+        JavaScript-Module (Reihenfolge wichtig!):
+        1. config.js    → Globale Konstanten und gemeinsamer Zustand
+        2. ui.js        → Toast, Scroll-to-Top, BMI, Begrüßung
+        3. auth.js      → Login, Logout, Dark Mode
+        4. chat.js      → Chat, Modell-Selektor, KI-Kommunikation
+        5. features.js  → Muskel, Wetter, PDF, Profil, Fisch
+    -->
+    <script src="js/config.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/features.js"></script>
 </body>
 
 </html>
