@@ -1,13 +1,90 @@
+const loginOverlay = document.getElementById('loginOverlay');
+const btnLogin = document.getElementById('btnLogin');
+const btnGuest = document.getElementById('btnGuest');
+const logoutBtn = document.getElementById('logoutBtn');
+const loginError = document.getElementById('loginError');
+
+// Falls bereits ein Token existiert, den Login-Screen direkt überspringen
+if (sessionStorage.getItem('myjyms_token')) {
+    if (loginOverlay) loginOverlay.style.display = 'none';
+}
+
+// Event-Listener für den Login-Button
+if (btnLogin) {
+    btnLogin.addEventListener('click', async () => {
+        const user = document.getElementById('loginUsername').value;
+        const pass = document.getElementById('loginPassword').value;
+
+        try {
+            const response = await fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Token sicher im Browser-Speicher hinterlegen
+                sessionStorage.setItem('myjyms_token', data.token);
+                loginOverlay.style.display = 'none';
+                loginError.style.display = 'none';
+            } else {
+                loginError.innerText = data.error || "Falsche Zugangsdaten!";
+                loginError.style.display = 'block';
+            }
+        } catch (err) {
+            loginError.innerText = "Backend-Server nicht erreichbar.";
+            loginError.style.display = 'block';
+        }
+    });
+}
+
+// Event-Listener für den Gast-Modus
+if (btnGuest) {
+    btnGuest.addEventListener('click', () => {
+        sessionStorage.removeItem('myjyms_token'); // Alte Sessions vorsichtshalber löschen
+        loginOverlay.style.display = 'none';
+    });
+}
+
+// Event-Listener für den Logout-Button
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        if (confirm("Möchtest du dich wirklich ausloggen?")) {
+            sessionStorage.removeItem('myjyms_token'); // Token vernichten
+            window.location.reload(); // Seite neu laden (Overlay erscheint wieder)
+        }
+    });
+}
+
 // --- 1. DARK MODE TOGGLE ---
 const darkModeBtn = document.getElementById('darkModeBtn');
-darkModeBtn.addEventListener('click', () => {
+const loginDarkModeBtn = document.getElementById('loginDarkModeBtn');
+
+function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
-    if (document.body.classList.contains('dark-mode')) {
-        darkModeBtn.innerText = "☀️ Light Mode";
-    } else {
-        darkModeBtn.innerText = "🌙 Dark Mode";
-    }
-});
+    const isDark = document.body.classList.contains('dark-mode');
+    
+    // Einstellung für den nächsten Besuch speichern
+    localStorage.setItem('myjyms_darkmode', isDark);
+    
+    // Icons auf allen Dark-Mode-Buttons aktualisieren
+    const icon = isDark ? '☀️' : '🌙';
+    if (darkModeBtn) darkModeBtn.innerText = icon + " Mode";
+    if (loginDarkModeBtn) loginDarkModeBtn.innerText = icon;
+}
+
+// Beim Laden der Seite prüfen, ob Dark Mode früher aktiviert wurde
+if (localStorage.getItem('myjyms_darkmode') === 'true') {
+    document.body.classList.add('dark-mode');
+    if (darkModeBtn) darkModeBtn.innerText = "☀️ Mode";
+    if (loginDarkModeBtn) loginDarkModeBtn.innerText = "☀️";
+}
+
+// Event-Listener für beide Buttons
+if (darkModeBtn) darkModeBtn.addEventListener('click', toggleDarkMode);
+if (loginDarkModeBtn) loginDarkModeBtn.addEventListener('click', toggleDarkMode);
 
 // --- 2. CHAT & PLAN GENERIERUNG ---
 const chatBox = document.getElementById('chatBox');
@@ -137,6 +214,56 @@ async function handleMuscleClick(userText, aiPrompt) {
         nachricht: aiPrompt,
         username,   // NEU: Name mitschicken
         fitness     // NEU: Level mitschicken
+    });
+}
+
+// DELETE:
+const btnClearChat = document.getElementById('btnClearChat');
+
+if (btnClearChat) {
+    btnClearChat.addEventListener('click', async () => {
+        // Kurze Sicherheitsabfrage an den Nutzer
+        if (confirm("Möchtest du den gesamten Chat-Verlauf auf dem Server löschen?")) {
+            try {
+                // Den Token holen, der beim Login gespeichert wurde
+                const token = sessionStorage.getItem('myjyms_token');
+
+                if (!token) {
+                    alert("Zugriff verweigert! Du musst eingeloggt sein (Admin), um den Verlauf zu löschen.");
+                    return;
+                }
+
+                // Geschützte DELETE-Route aufrufen
+                const response = await fetch('http://localhost:3000/api/plans/1', {
+                    method: 'DELETE',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Chat-Fenster im Frontend leeren und Erfolgsmeldung anzeigen
+                    const chatBox = document.getElementById('chatBox');
+                    if (chatBox) {
+                        chatBox.innerHTML = `<div class="chat-msg msg-ai">🧹 ${data.message} Neuer Chat gestartet!</div>`;
+                    }
+                    
+                    // Falls du das KI-Gedächtnis-Array nutzt, hier auch leeren:
+                    if (typeof chatHistory !== 'undefined') {
+                        chatHistory = [];
+                    }
+                } else {
+                    alert(data.error || "Fehler beim Löschen.");
+                }
+
+            } catch (error) {
+                console.error("DELETE Fehler:", error);
+                alert("Server nicht erreichbar.");
+            }
+        }
     });
 }
 

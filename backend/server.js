@@ -56,7 +56,12 @@ function authenticateToken(req, res, next) {
 
 // --- M6 & M8: HTTP ENDPOINTS ---
 
-// 1. GET (Bleibt wie vorher)
+// 1. GET
+app.get('/api/exercises', (req, res) => {
+    res.json({ uebungen: ["Bankdrücken", "Flys", "Liegestütze"] });
+});
+
+// 2. POST
 app.post('/api/plans', async (req, res) => {
     // Alle Daten empfangen
     const { username, geschlecht, fitness, alter, gewicht, groesse, ziel, nachricht, history } = req.body; 
@@ -118,18 +123,32 @@ app.post('/api/plans', async (req, res) => {
     }
 });
 
-// 3. PUT (Bleibt wie vorher)
+// 3. PUT 
 app.put('/api/users/:id', (req, res) => {
     const userId = req.params.id;
     const updateData = req.body;
     res.json({ message: `Profil von User ${userId} wurde komplett aktualisiert.`, data: updateData });
 });
 
-// 4. DELETE (Ressource löschen - JETZT ABGESICHERT!)
+function authenticateToken(req, res, next) {
+    // Holt den Token aus dem Header der Anfrage
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; 
+
+    if (token == null) return res.status(401).json({ error: "Halt! Du musst eingeloggt sein." });
+
+    // Prüft, ob der Token echt ist
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) return res.status(403).json({ error: "Token abgelaufen oder gefälscht!" });
+        req.user = user; 
+        next(); // Lässt den Nutzer durch zur DELETE-Route
+    });
+}
+
+// 4. DELETE
 app.delete('/api/plans/:id', authenticateToken, (req, res) => {
-    const planId = req.params.id;
-    // Da wir authenticateToken nutzen, wissen wir jetzt sogar, WER löscht:
-    res.json({ message: `Trainingsplan mit ID ${planId} wurde von User '${req.user.user}' gelöscht.` });
+    // Hier würde bei einer echten Datenbank der Löschbefehl stehen
+    res.json({ message: "Erfolgreich gelöscht! Der Chatverlauf wurde bereinigt." });
 });
 
 // --- SERVER STARTEN ---
