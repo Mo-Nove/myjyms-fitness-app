@@ -1,11 +1,16 @@
 /**
- * routes/users.js – Benutzerverwaltung (M6, C3)
+ * routes/users.js – Benutzerverwaltung
  *
- * GET    /api/users       – Alle User laden (geschützt)
- * POST   /api/users       – Neuen User anlegen (geschützt)
- * PUT    /api/users/:id   – Profil komplett aktualisieren (M6)
- * PATCH  /api/users/:id   – Einzelne Felder ändern (C3)
- * DELETE /api/users/:id   – User löschen (geschützt)
+ * ── Anforderungen ───────────────────────────────────────────
+ *   M6 – GET, POST, PUT, DELETE Endpunkte   → Alle 4 HTTP-Methoden hier implementiert
+ *   M9 – Geschützte Routen mit JWT          → GET, POST, PATCH, DELETE via authenticateToken
+ *   C3 – PATCH-Endpunkt im Backend          → PATCH /api/users/:id (teilweise Aktualisierung)
+ *
+ * GET    /api/users       – Alle User laden (geschützt)       (M6)
+ * POST   /api/users       – Neuen User anlegen (geschützt)    (M6)
+ * PUT    /api/users/:id   – Profil komplett aktualisieren     (M6)
+ * PATCH  /api/users/:id   – Einzelne Felder ändern            (C3)
+ * DELETE /api/users/:id   – User löschen (geschützt)          (M6)
  */
 
 const express = require('express');
@@ -14,7 +19,7 @@ const { users, generateUserId } = require('../data');
 
 const router = express.Router();
 
-// ── GET: Alle Benutzer laden ────────────────────────────────
+// ── GET: Alle Benutzer laden (M6: GET) ──────────────────
 
 router.get('/', authenticateToken, (req, res) => {
     // Passwort niemals an den Client senden!
@@ -22,7 +27,7 @@ router.get('/', authenticateToken, (req, res) => {
     sendResponse(req, res, { users: safeUsers });
 });
 
-// ── PUT: Profil komplett aktualisieren ──────────────────────
+// ── PUT: Profil komplett aktualisieren (M6: PUT) ──────────
 
 router.put('/:id', (req, res) => {
     const user = findUserById(req.params.id);
@@ -52,7 +57,7 @@ router.put('/:id', (req, res) => {
     });
 });
 
-// ── PATCH: Einzelne Felder ändern (C3) ──────────────────────
+// ── PATCH: Einzelne Felder ändern (C3: PATCH-Endpunkt) ────────
 
 const PATCHABLE_FIELDS = ['username', 'gewicht', 'groesse', 'alter', 'fitness', 'role'];
 const VALID_FITNESS_LEVELS = ['Anfänger', 'Fortgeschritten', 'Profi'];
@@ -88,7 +93,7 @@ router.patch('/:id', authenticateToken, (req, res) => {
     sendResponse(req, res, { message: 'Profil teilweise aktualisiert.', updated: applied });
 });
 
-// ── POST: Neuen User anlegen ────────────────────────────────
+// ── POST: Neuen User anlegen (M6: POST) ─────────────────
 
 router.post('/', authenticateToken, (req, res) => {
     const { username, password, role, gewicht, groesse, alter, fitness } = req.body;
@@ -125,7 +130,7 @@ router.post('/', authenticateToken, (req, res) => {
     sendResponse(req, res, { message: `User "${username}" erstellt.`, user: safeUser }, 201);
 });
 
-// ── DELETE: User löschen ────────────────────────────────────
+// ── DELETE: User löschen (M6: DELETE) ───────────────────
 
 router.delete('/:id', authenticateToken, (req, res) => {
     const userId = parseInt(req.params.id);

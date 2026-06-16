@@ -1,6 +1,11 @@
 /**
  * auth.js – Authentifizierung & Dark Mode
  *
+ * ── Anforderungen ───────────────────────────────────────────
+ *   M4 – Asynchroner Datentransfer (AJAX)   → Login via async fetch()
+ *   M7 – Frontend nutzt POST                → POST /api/login
+ *   M9 – Session Management im Frontend     → JWT im sessionStorage
+ *
  * Verwaltet Login, Logout, Gast-Modus und den Dark Mode Toggle.
  * Der JWT-Token wird im sessionStorage gespeichert (verschwindet
  * beim Schließen des Browser-Tabs – sicherer als localStorage).
@@ -24,7 +29,7 @@ if (sessionStorage.getItem('myjyms_token') && loginOverlay) {
     loginOverlay.style.display = 'none';
 }
 
-// ── Login ───────────────────────────────────────────────────
+// ── Login (M4: AJAX, M7: POST /api/login, M9: JWT-Token) ──
 
 if (btnLogin) {
     btnLogin.addEventListener('click', async () => {

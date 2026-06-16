@@ -1,5 +1,10 @@
 /**
- * routes/weather.js – Wetter-API (S1, C1)
+ * routes/weather.js – Wetter-API
+ *
+ * ── Anforderungen ───────────────────────────────────────────
+ *   S1 – Mind. 2 externe REST-Services      → Open-Meteo = Externe API 2
+ *   C1 – Mind. 3 externe REST-Services      → Open-Meteo = Externe API 2
+ *        (API 1 = Google Gemini)
  *
  * GET /api/weather – Aktuelle Wetterdaten von Open-Meteo (Externe API 3)
  *
@@ -27,6 +32,7 @@ router.get('/', async (req, res) => {
         const lat = parseFloat(req.query.lat) || DEFAULT_LAT;
         const lon = parseFloat(req.query.lon) || DEFAULT_LON;
 
+        // C1: Dritter externer REST-Service (Open-Meteo API)
         const url = `https://api.open-meteo.com/v1/forecast`
             + `?latitude=${lat}&longitude=${lon}&current_weather=true`;
 

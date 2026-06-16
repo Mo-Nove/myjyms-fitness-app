@@ -1,3 +1,12 @@
+<!--
+    MyJyms – Haupt-Frontend (Frontend-Komponente 1)
+
+    Anforderungen:
+      M2 – Frontend mit HTML5, CSS, JS     → Diese Datei + style.css + js/
+      M3 – Kommunikation über HTTP         → fetch() Aufrufe an localhost:3000
+      S3 – W3C-konformes HTML             → Validiert mit validator.w3.org
+      S4 – Responsive Design              → Media Queries in style.css (900px, 600px)
+-->
 <!DOCTYPE html>
 <html lang="de">
 
@@ -10,7 +19,7 @@
     <link rel="stylesheet" href="style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 </head>
 
 <body>
@@ -99,7 +108,6 @@
                 <div class="chat-header">
                     <h2 class="chat-title">2. Chatte mit deinem Coach</h2>
                     <div class="chat-actions">
-                        <button id="btnExportPdf" class="export-btn" title="Wochenplan als PDF exportieren">PDF</button>
                         <button id="btnClearChat" class="clear-chat-btn">Chat leeren</button>
                     </div>
                 </div>
@@ -111,15 +119,7 @@
                 <div class="chat-input-wrapper">
                     <input type="text" id="chatInput" placeholder="MyJyms fragen...">
                     <div class="chat-input-actions">
-                        <div class="model-dropdown" id="modelDropdown">
-                            <button type="button" class="model-pill" id="modelPillBtn">
-                                <span id="modelPillLabel">Flash</span>
-                                <svg width="10" height="6" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="currentColor"/></svg>
-                            </button>
-                            <div class="model-popup" id="modelPopup">
-                                <div class="model-popup-list" id="modelPopupList"></div>
-                            </div>
-                        </div>
+                        <span class="model-label" id="modelPillLabel">2.5 Flash</span>
                         <button id="btnSendChat" class="send-btn">
                             <svg viewBox="0 0 24 24" class="send-icon">
                                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
@@ -136,7 +136,7 @@
                 <h3>Outdoor-Training?</h3>
                 <div class="weather-select-row">
                     <label for="weatherRegion">Bundesland:</label>
-                    <select id="weatherRegion">
+                    <select id="weatherRegion" class="weather-pill-select">
                         <option value="48.2085,16.3721">Wien</option>
                         <option value="47.07,15.44">Steiermark (Graz)</option>
                         <option value="47.26,11.39">Tirol (Innsbruck)</option>

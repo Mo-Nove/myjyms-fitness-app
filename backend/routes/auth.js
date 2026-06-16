@@ -1,7 +1,13 @@
 /**
- * routes/auth.js – Authentifizierung (Anforderung M9)
+ * routes/auth.js – Authentifizierung
  *
- * POST /api/login – Benutzer einloggen und JWT-Token erstellen
+ * ── Anforderungen ───────────────────────────────────────────
+ *   M6 – HTTP POST Endpunkt                 → POST /api/login
+ *   M9 – Session Management (JWT)           → Token wird bei Login erstellt
+ *
+ * POST /api/login – Benutzer einloggen und JWT-Token erstellen.
+ * Der Token wird vom Frontend im sessionStorage gespeichert und
+ * bei geschützten Requests im Authorization-Header mitgeschickt.
  */
 
 const express = require('express');

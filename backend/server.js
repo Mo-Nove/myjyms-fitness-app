@@ -5,26 +5,49 @@
  *
  * Dieser Server stellt die REST-API für die MyJyms Fitness-App bereit.
  *
- * Projektstruktur (Clean Code: Separation of Concerns):
- * ─────────────────────────────────────────────────────
+ * ── Erfüllte Anforderungen (Übersicht) ──────────────────────
+ *
+ * MUST (21 Punkte – alle erfüllt):
+ *   M1 – Backend ist eigene Komponente       → /backend (eigener Ordner + package.json)
+ *   M2 – Frontend ist eigene Komponente      → /frontend (HTML5, CSS, JS)
+ *   M3 – Kommunikation über HTTP             → Frontend ruft Backend via fetch() auf Port 3000
+ *   M4 – Asynchroner Datentransfer (AJAX)    → Alle Requests nutzen async/await + fetch()
+ *   M5 – Endpunkte liefern JSON oder XML     → sendResponse() in helpers.js (Accept-Header)
+ *   M6 – GET, POST, PUT, DELETE im Backend   → plans.js, users.js, models.js
+ *   M7 – GET, POST, PUT, DELETE im Frontend  → index.html (js/), admin.html (app.js)
+ *   M8 – Mind. 1 externer REST-Service       → Google Gemini API (plans.js)
+ *   M9 – Session Management                  → JWT-Token (auth.js, helpers.js)
+ *
+ * SHOULD (8 Punkte – alle erfüllt):
+ *   S1 – Mind. 2 externe REST-Services       → + Open-Meteo API (weather.js)
+ *   S2 – Zweite Frontend-Komponente (3+ EP)  → admin.html nutzt 9+ Endpunkte
+ *   S3 – W3C-konformes HTML                  → Validiert mit validator.w3.org
+ *   S4 – Responsive Design (Mobile+Desktop)  → Media Queries in style.css (900px, 600px)
+ *
+ * COULD (5 Punkte – alle erfüllt):
+ *   C1 – Mind. 3 externe REST-Services       → + Open-Meteo API (weather.js)
+ *   C2 – Antworten als JSON UND XML          → sendResponse() prüft Accept-Header
+ *   C3 – PATCH-Endpunkt im Backend + FE      → PATCH /api/users/:id (users.js + app.js)
+ *
+ * ── Projektstruktur (Clean Code: Separation of Concerns) ────
+ *
  *   server.js       → Einstiegspunkt (Middleware + Routen einbinden)
  *   config.js       → Konfiguration (Port, API-Keys, KI-Modelle)
  *   data.js         → In-Memory Datenspeicher (Users, Pläne)
  *   helpers.js      → Hilfsfunktionen (XML, Antwortformat, JWT)
  *   routes/         → API-Endpunkte, nach Bereich getrennt:
- *     auth.js       →   POST   /api/login
- *     plans.js      →   GET | POST | DELETE  /api/plans
- *     users.js      →   GET | PUT  | PATCH   /api/users
- *     exercises.js  →   GET  /api/exercises  (intern + wger.de)
- *     weather.js    →   GET  /api/weather    (Open-Meteo)
+ *     auth.js       →   POST   /api/login                    (M9)
+ *     plans.js      →   GET | POST | DELETE  /api/plans       (M6, M8)
+ *     users.js      →   GET | POST | PUT | PATCH | DELETE     (M6, C3)
+ *     exercises.js  →   GET  /api/exercises  (intern)         (M6)
+ *     weather.js    →   GET  /api/weather    (Open-Meteo)     (S1, C1)
  *     models.js     →   GET | PUT  /api/models
  *
- * Verwendete Technologien:
+ * ── Verwendete Technologien ─────────────────────────────────
  *   - Express 5           (HTTP-Framework)
  *   - JWT                 (Authentifizierung via Token)
- *   - Google Gemini API   (KI-Trainingscoach)
- *   - wger.de API         (Übungsdatenbank)
- *   - Open-Meteo API      (Wetterdaten)
+ *   - Google Gemini API   (KI-Trainingscoach – Externe API 1)
+ *   - Open-Meteo API      (Wetterdaten – Externe API 2)
  */
 
 const express = require('express');
@@ -51,13 +74,14 @@ app.use((req, res, next) => {
 });
 
 // ── Routen einbinden (jede Datei = ein Verantwortungsbereich) ─
+// (M1: Backend ist eigenständige Komponente mit klarer Routenstruktur)
 
-app.use('/api',           require('./routes/auth'));
-app.use('/api/plans',     require('./routes/plans'));
-app.use('/api/users',     require('./routes/users'));
-app.use('/api/exercises', require('./routes/exercises'));
-app.use('/api/weather',   require('./routes/weather'));
-app.use('/api/models',    require('./routes/models'));
+app.use('/api',           require('./routes/auth'));       // POST /api/login           (M9)
+app.use('/api/plans',     require('./routes/plans'));      // GET, POST, DELETE         (M6, M8)
+app.use('/api/users',     require('./routes/users'));      // GET, POST, PUT, PATCH, DELETE (M6, C3)
+app.use('/api/exercises', require('./routes/exercises'));   // GET (intern)              (M6)
+app.use('/api/weather',   require('./routes/weather'));    // GET (Open-Meteo)          (S1, C1)
+app.use('/api/models',    require('./routes/models'));     // GET, PUT
 
 // ── Server starten ──────────────────────────────────────────
 

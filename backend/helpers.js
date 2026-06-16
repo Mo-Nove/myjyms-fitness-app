@@ -1,9 +1,13 @@
 /**
  * helpers.js – Hilfsfunktionen
  *
- * Enthält die XML-Konvertierung (Anforderung C2) und die
- * einheitliche Antwort-Funktion, die je nach Accept-Header
- * des Clients JSON oder XML zurückgibt.
+ * ── Anforderungen ───────────────────────────────────────────
+ *   M5 – Endpunkte liefern JSON oder XML    → sendResponse()
+ *   M9 – Session Management (JWT)           → authenticateToken()
+ *   C2 – Antworten als JSON UND XML         → convertToXml() + Accept-Header Logik
+ *
+ * Enthält die XML-Konvertierung und die einheitliche Antwort-Funktion,
+ * die je nach Accept-Header des Clients JSON oder XML zurückgibt.
  */
 
 const jwt = require('jsonwebtoken');
@@ -54,9 +58,12 @@ function convertToXml(data, rootElement = 'response') {
 // ── Einheitliche Antwort-Funktion ───────────────────────────
 
 /**
- * Sendet die Antwort im richtigen Format:
- * - Client schickt "Accept: application/xml" → XML
+ * Sendet die Antwort im richtigen Format (M5, C2):
+ * - Client schickt "Accept: application/xml" → XML-Antwort
  * - Sonst → JSON (Standard)
+ *
+ * Wird von ALLEN Endpunkten verwendet, dadurch unterstützt
+ * jeder Endpunkt automatisch beide Formate.
  */
 function sendResponse(req, res, data, statusCode = 200) {
     const accept = req.headers['accept'] || '';

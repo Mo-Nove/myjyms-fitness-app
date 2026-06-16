@@ -1,4 +1,12 @@
 /* =========================================
+   MyJyms – Haupt-Stylesheet
+
+   Anforderungen:
+     M2 – Frontend mit CSS                → Dieses Stylesheet
+     S4 – Responsive Design               → Media Queries für Tablet (900px)
+          und Mobile (600px) mit eigenen Views
+   =========================================
+
    1. GLOBALE VARIABLEN (LIGHT & DARK MODE)
    ========================================= */
 
@@ -234,15 +242,7 @@ header h1 {
         white-space: nowrap;
     }
 
-    /* Modell-Popup: volle Breite auf Handy */
-    .model-popup {
-        position: fixed;
-        bottom: 70px;
-        right: 8px;
-        left: 8px;
-        min-width: auto;
-        border-radius: 14px;
-    }
+
 
     /* Muskelkarte: kompakter */
     .muscle-flipper {
@@ -300,8 +300,8 @@ header h1 {
         opacity: 0.5;
     }
 
-    /* Export + Clear-Chat Buttons: kompakter */
-    .export-btn, .clear-chat-btn {
+    /* Clear-Chat Button: kompakter */
+    .clear-chat-btn {
         padding: 5px 8px;
         font-size: 0.8em;
     }
@@ -466,10 +466,9 @@ button.primary-btn:hover {
     flex-shrink: 0;
 }
 
-.model-pill {
-    display: flex;
+.model-label {
+    display: inline-flex;
     align-items: center;
-    gap: 5px;
     padding: 6px 12px;
     margin: 0;
     font-size: 0.8em;
@@ -477,106 +476,12 @@ button.primary-btn:hover {
     border-radius: 20px;
     border: 1px solid var(--border);
     background: var(--card-bg);
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.2s;
+    color: var(--text-muted, #888);
     white-space: nowrap;
     font-family: inherit;
-}
-
-.model-pill svg {
-    opacity: 0.5;
-    transition: opacity 0.2s;
-}
-
-.model-pill:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-.model-pill:hover svg {
-    opacity: 1;
-}
-
-/* Custom Dropdown */
-.model-dropdown {
-    position: relative;
-}
-
-.model-popup {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    right: 0;
-    min-width: 220px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    padding: 6px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(6px) scale(0.97);
-    transition: opacity 0.18s, transform 0.18s, visibility 0.18s;
-    z-index: 100;
-}
-
-.model-popup-open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-}
-
-.model-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    padding: 10px 12px;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--text);
-    cursor: pointer;
-    font-family: inherit;
-    text-align: left;
-    transition: background 0.15s;
-}
-
-.model-option:hover {
-    background: rgba(233, 150, 35, 0.08);
-}
-
-.model-option-active {
-    background: rgba(233, 150, 35, 0.12);
-}
-
-.model-option-active:hover {
-    background: rgba(233, 150, 35, 0.18);
-}
-
-.model-option-check {
-    width: 18px;
-    font-size: 0.85em;
-    color: var(--primary);
     font-weight: bold;
     flex-shrink: 0;
     text-align: center;
-}
-
-.model-option-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-
-.model-option-name {
-    font-weight: 600;
-    font-size: 0.9em;
-}
-
-.model-option-desc {
-    font-size: 0.75em;
-    opacity: 0.6;
 }
 
 .send-btn {
@@ -961,29 +866,32 @@ button.secondary-btn:hover {
     flex-shrink: 0;
 }
 
-.weather-select-row select {
-    flex: 1;
-    padding: 8px 36px 8px 12px;
+.weather-pill-select {
+    padding: 6px 32px 6px 12px;
     margin: 0;
-    font-size: 0.9em;
-    border-radius: 8px;
+    font-size: 0.8em;
+    font-weight: 600;
+    border-radius: 20px;
     border: 1px solid var(--border);
-    background-color: var(--bg);
+    background-color: var(--card-bg);
     color: var(--text);
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: inherit;
 }
 
-.weather-select-row select:hover {
+.weather-pill-select:hover {
     border-color: var(--primary);
+    color: var(--primary);
 }
 
-.weather-select-row select:focus {
+.weather-pill-select:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(233, 150, 35, 0.15);
@@ -1137,25 +1045,7 @@ button.secondary-btn:hover {
     transform: translateY(0);
 }
 
-/* =========================================
-   PDF EXPORT BUTTON
-   ========================================= */
 
-.export-btn {
-    background: transparent;
-    border: 1px solid var(--primary);
-    color: var(--primary);
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s;
-}
-
-.export-btn:hover {
-    background-color: var(--primary);
-    color: #fff;
-}
 
 .chat-actions {
     display: flex;
@@ -1280,11 +1170,10 @@ body.dark-mode .msg-error {
 }
 
 @media (max-width: 600px) {
-    .model-pill {
+    .model-label {
         font-size: 0.72em;
         padding: 4px 8px;
     }
-    .model-pill svg { width: 8px; height: 5px; }
     .send-btn {
         width: 34px;
         height: 34px;

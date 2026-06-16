@@ -25,8 +25,6 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 const AVAILABLE_MODELS = [
     { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', description: 'Schnell & effizient' },
-    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', description: 'Stabil & bewährt' },
-    { id: 'gemini-2.5-pro',   name: 'Gemini 2.5 Pro',   description: 'Beste Qualität (langsamer)' },
 ];
 
 // Das aktuell aktive KI-Modell – kann zur Laufzeit gewechselt werden

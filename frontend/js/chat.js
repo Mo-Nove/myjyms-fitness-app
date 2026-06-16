@@ -1,6 +1,11 @@
 /**
  * chat.js – Chat-Funktionalität & KI-Kommunikation
  *
+ * ── Anforderungen ───────────────────────────────────────────
+ *   M4 – Asynchroner Datentransfer (AJAX)   → async fetch() für KI-Anfragen
+ *   M7 – Frontend nutzt POST                → POST /api/plans (KI-Chat)
+ *   M8 – Externer REST-Service (indirekt)   → Backend leitet an Google Gemini weiter
+ *
  * Verwaltet den Chat mit dem KI-Coach:
  * - Nachrichten senden und im Chat anzeigen
  * - Typing-Animation (drei springende Punkte)
@@ -21,85 +26,24 @@ const btnGeneratePlan = document.getElementById('btnGeneratePlan');
 //  MODELL-SELEKTOR (Custom Dropdown im Gemini-Stil)
 // ══════════════════════════════════════════════════════════════
 
-const modelPillBtn   = document.getElementById('modelPillBtn');
 const modelPillLabel = document.getElementById('modelPillLabel');
-const modelPopup     = document.getElementById('modelPopup');
-const modelPopupList = document.getElementById('modelPopupList');
 
-/** Lädt die verfügbaren KI-Modelle vom Backend */
+/** Lädt den aktiven Modellnamen vom Backend */
 async function loadModels() {
-    if (!modelPopupList) return;
     try {
         const res = await fetch(`${API_BASE}/api/models`);
         const data = await res.json();
         currentModelId = data.current;
-        renderModelList(data.models, data.current);
+        const selected = data.models.find(m => m.id === data.current);
+        if (selected && modelPillLabel) {
+            modelPillLabel.textContent = selected.name.replace('Gemini ', '');
+        }
     } catch {
         if (modelPillLabel) modelPillLabel.textContent = 'Offline';
     }
 }
 
-/** Rendert die Modell-Liste im Popup */
-function renderModelList(models, selectedId) {
-    modelPopupList.innerHTML = '';
-
-    models.forEach(model => {
-        const isActive = model.id === selectedId;
-        const item = document.createElement('button');
-        item.type = 'button';
-        item.className = 'model-option' + (isActive ? ' model-option-active' : '');
-        item.innerHTML = `
-            <span class="model-option-check">${isActive ? '✓' : ''}</span>
-            <div class="model-option-info">
-                <span class="model-option-name">${model.name.replace('Gemini ', '')}</span>
-                <span class="model-option-desc">${model.description}</span>
-            </div>
-        `;
-        item.addEventListener('click', () => selectModel(model, models));
-        modelPopupList.appendChild(item);
-    });
-
-    // Pill-Button Label aktualisieren
-    const selected = models.find(m => m.id === selectedId);
-    if (selected && modelPillLabel) {
-        modelPillLabel.textContent = selected.name.replace('Gemini ', '');
-    }
-}
-
-/** Wechselt das aktive KI-Modell über die Backend-API */
-async function selectModel(model, allModels) {
-    modelPopup.classList.remove('model-popup-open');
-    try {
-        const res = await fetch(`${API_BASE}/api/models`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ modelId: model.id }),
-        });
-        const data = await res.json();
-        currentModelId = model.id;
-        renderModelList(allModels, model.id);
-        showToast(data.message || 'Modell gewechselt!');
-    } catch {
-        showToast('Modellwechsel fehlgeschlagen.', 'error');
-    }
-}
-
-// Popup öffnen / schließen
-if (modelPillBtn) {
-    modelPillBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        modelPopup.classList.toggle('model-popup-open');
-    });
-}
-
-// Popup schließen wenn man außerhalb klickt
-document.addEventListener('click', (e) => {
-    if (modelPopup && !modelPopup.contains(e.target) && e.target !== modelPillBtn) {
-        modelPopup.classList.remove('model-popup-open');
-    }
-});
-
-// Modelle beim Seitenstart laden
+// Modellname beim Seitenstart laden
 loadModels();
 
 // ══════════════════════════════════════════════════════════════
@@ -175,9 +119,21 @@ function addCopyButton(messageElement, rawText) {
 //  BACKEND-KOMMUNIKATION
 // ══════════════════════════════════════════════════════════════
 
-/** Sendet eine Anfrage an die KI und zeigt die Antwort im Chat */
-async function sendToBackend(payload) {
-    showTyping();
+/**
+ * Erstellt einen Platzhalter (Typing-Animation) direkt unter der User-Nachricht.
+ * Gibt das Platzhalter-Element zurück, das später mit der Antwort befüllt wird.
+ */
+function createAnswerPlaceholder() {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'chat-msg msg-ai typing-placeholder';
+    placeholder.innerHTML = '<div class="typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+    chatBox.appendChild(placeholder);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    return placeholder;
+}
+
+/** Sendet eine Anfrage an die KI und zeigt die Antwort im zugehörigen Platzhalter */
+async function sendToBackend(payload, placeholder) {
 
     // Chat-Verlauf mitschicken (ohne die gerade gesendete Nachricht)
     payload.history = chatHistory.slice(0, -1);
@@ -189,39 +145,45 @@ async function sendToBackend(payload) {
             body: JSON.stringify(payload),
         });
         const data = await response.json();
-        removeTyping();
 
         if (data.plan) {
+            placeholder.classList.remove('typing-placeholder');
             if (data.errorType) {
-                addMessageToChat(data.plan, false, data.errorType);
+                placeholder.classList.add('msg-error');
+                placeholder.innerHTML = marked.parse(data.plan);
             } else {
-                addMessageToChat(data.plan, false);
+                placeholder.innerHTML = marked.parse(data.plan);
+                addCopyButton(placeholder, data.plan);
                 chatHistory.push({ sender: 'ai', text: data.plan });
             }
         } else {
-            addMessageToChat('❌ Keine Antwort vom Server erhalten.', false, 'UNKNOWN');
+            placeholder.classList.add('msg-error');
+            placeholder.innerHTML = 'Da ist leider etwas schiefgelaufen. Bitte versuche es erneut.';
         }
     } catch {
-        removeTyping();
-        addMessageToChat(
-            '🌐 **Verbindung zum Server fehlgeschlagen.** Ist der Backend-Server gestartet?',
-            false, 'NETWORK_ERROR'
-        );
+        placeholder.classList.add('msg-error');
+        placeholder.innerHTML = '<strong>Keine Verbindung zum Server.</strong> Bitte prüfe, ob der Server läuft, und versuche es erneut.';
     }
+
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 /**
  * Wird aufgerufen wenn der User auf einen Muskel in der SVG klickt.
  * Schickt die Anfrage an die KI mit den aktuellen Profildaten.
+ * Das Feld 'muskelgruppe' ermöglicht dem Backend den 2-Stufen-Fallback:
+ *   Stufe 1: Google Gemini KI → Stufe 2: Fixe Antworten
  */
-function handleMuscleClick(userText, aiPrompt) {
+function handleMuscleClick(userText, aiPrompt, muskelgruppe) {
     const username = document.getElementById('inputUsername')?.value || 'User';
     const fitness  = document.getElementById('inputFitness')?.value || 'Anfänger';
+    const alter    = document.getElementById('inputAlter')?.value || '';
 
     addMessageToChat(userText, true);
     chatHistory.push({ sender: 'user', text: aiPrompt });
 
-    sendToBackend({ nachricht: aiPrompt, username, fitness });
+    const placeholder = createAnswerPlaceholder();
+    sendToBackend({ nachricht: aiPrompt, username, fitness, alter, muskelgruppe }, placeholder);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -238,16 +200,24 @@ btnGeneratePlan?.addEventListener('click', () => {
     const groesse    = document.getElementById('inputGroesse').value;
     const ziel       = document.getElementById('inputZiel').value;
 
-    if (!ziel) return alert('Bitte gib mindestens dein Hauptziel ein!');
+    const details = [];
+    if (alter)   details.push(`Alter: ${alter}`);
+    if (gewicht) details.push(`Gewicht: ${gewicht}kg`);
+    if (groesse) details.push(`Größe: ${groesse}cm`);
 
-    const userMsg = `Hallo Coach! Ich bin ${username} (${geschlecht}). `
+    let userMsg = `Hallo Coach! Ich bin ${username} (${geschlecht}). `
         + `Ich bin auf dem Level "${fitness}". `
-        + `Erstelle mir einen Wochenplan für mein Ziel: ${ziel}. `
-        + `(Alter: ${alter}, Gewicht: ${gewicht}kg, Größe: ${groesse}cm)`;
+        + `Erstelle mir einen Wochenplan`;
+
+    if (ziel) userMsg += ` für mein Ziel: ${ziel}.`;
+    else      userMsg += '.';
+
+    if (details.length) userMsg += ` (${details.join(', ')})`;
 
     addMessageToChat(userMsg, true);
     chatHistory.push({ sender: 'user', text: userMsg });
-    sendToBackend({ username, geschlecht, fitness, alter, gewicht, groesse, ziel });
+    const placeholder = createAnswerPlaceholder();
+    sendToBackend({ username, geschlecht, fitness, alter, gewicht, groesse, ziel }, placeholder);
 });
 
 // Freie Chat-Nachricht senden
@@ -258,7 +228,8 @@ btnSendChat?.addEventListener('click', () => {
     addMessageToChat(msg, true);
     chatInput.value = '';
     chatHistory.push({ sender: 'user', text: msg });
-    sendToBackend({ nachricht: msg });
+    const placeholder = createAnswerPlaceholder();
+    sendToBackend({ nachricht: msg }, placeholder);
 });
 
 // Enter-Taste zum Senden

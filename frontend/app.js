@@ -1,6 +1,13 @@
 /**
  * app.js – Admin-Dashboard Logik (Zweite Frontend-Komponente)
  *
+ * ── Anforderungen ───────────────────────────────────────────
+ *   S2 – Zweite Frontend-Komponente         → admin.html + app.js (eigenständiges Dashboard)
+ *        Kommuniziert mit 9+ Backend-Endpunkten (mind. 3 gefordert)
+ *   M7 – Frontend nutzt GET, POST, DELETE   → Users laden, erstellen, löschen
+ *   C2 – JSON und XML Antworten             → Format-Toggle (JSON ↔ XML) im UI
+ *   C3 – PATCH im Frontend                  → PATCH /api/users/:id (User teilweise ändern)
+ *
  * Steuert das Admin-Dashboard (admin.html):
  * - Login / Logout für Administratoren
  * - Dark Mode
@@ -25,7 +32,7 @@ let authToken = sessionStorage.getItem('admin_token') || null;
 if (authToken) showDashboard();
 
 // ══════════════════════════════════════════════════════════════
-//  LOGIN (POST /api/login)
+//  LOGIN (M4: AJAX, M7: POST /api/login, M9: Session Management)
 // ══════════════════════════════════════════════════════════════
 
 document.getElementById('btnAdminLogin').addEventListener('click', async () => {
@@ -112,7 +119,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 //  HILFSFUNKTIONEN (DRY: werden überall wiederverwendet)
 // ══════════════════════════════════════════════════════════════
 
-/** Gibt den richtigen Accept-Header zurück (JSON oder XML) */
+/** Gibt den richtigen Accept-Header zurück (C2: JSON oder XML Toggle) */
 function getAcceptHeader() {
     const format = document.getElementById('formatSelect').value;
     return format === 'xml' ? 'application/xml' : 'application/json';
@@ -142,7 +149,7 @@ function showRaw(element, data) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  USERS: GET /api/users (alle Benutzer laden)
+//  USERS: GET /api/users (M7: Frontend nutzt GET-Methode)
 // ══════════════════════════════════════════════════════════════
 
 document.getElementById('btnLoadUsers').addEventListener('click', async () => {
@@ -180,7 +187,7 @@ document.getElementById('btnLoadUsers').addEventListener('click', async () => {
 });
 
 // ══════════════════════════════════════════════════════════════
-//  USERS: DELETE /api/users/:id (User löschen)
+//  USERS: DELETE /api/users/:id (M7: Frontend nutzt DELETE-Methode)
 // ══════════════════════════════════════════════════════════════
 
 function attachUserDeleteHandlers() {
@@ -210,7 +217,7 @@ function attachUserDeleteHandlers() {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  USERS: PATCH /api/users/:id (einzelne Felder ändern – C3)
+//  USERS: PATCH /api/users/:id (C3: PATCH im Frontend konsumiert)
 // ══════════════════════════════════════════════════════════════
 
 document.getElementById('btnPatchUser').addEventListener('click', async () => {
@@ -256,7 +263,7 @@ document.getElementById('btnPatchUser').addEventListener('click', async () => {
 });
 
 // ══════════════════════════════════════════════════════════════
-//  USERS: POST /api/users (neuen User anlegen)
+//  USERS: POST /api/users (M7: Frontend nutzt POST-Methode)
 // ══════════════════════════════════════════════════════════════
 
 document.getElementById('btnCreateUser').addEventListener('click', async () => {
@@ -399,28 +406,7 @@ document.getElementById('btnLoadExercises').addEventListener('click', async () =
 });
 
 // ══════════════════════════════════════════════════════════════
-//  EXTERNE API: GET /api/exercises/external (wger.de – API 2)
-// ══════════════════════════════════════════════════════════════
-
-document.getElementById('btnLoadExternal').addEventListener('click', async () => {
-    const el = document.getElementById('externalResult');
-    el.textContent = 'Lade...';
-    el.style.display = 'block';
-
-    try {
-        const response = await fetch(`${API_BASE}/api/exercises/external`, {
-            headers: { 'Accept': getAcceptHeader() },
-        });
-        const isXml = response.headers.get('content-type')?.includes('xml');
-        const data = isXml ? await response.text() : await response.json();
-        showRaw(el, data);
-    } catch {
-        el.textContent = 'Fehler beim Laden der externen API.';
-    }
-});
-
-// ══════════════════════════════════════════════════════════════
-//  EXTERNE API: GET /api/weather (Open-Meteo – API 3)
+//  EXTERNE API: GET /api/weather (Open-Meteo – API 2)
 // ══════════════════════════════════════════════════════════════
 
 document.getElementById('btnLoadWeather').addEventListener('click', async () => {
