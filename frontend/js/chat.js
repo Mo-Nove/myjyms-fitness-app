@@ -27,8 +27,9 @@ const btnGeneratePlan = document.getElementById('btnGeneratePlan');
 // ══════════════════════════════════════════════════════════════
 
 const modelPillLabel = document.getElementById('modelPillLabel');
+const modelDropdown  = document.getElementById('modelDropdown');
 
-/** Lädt den aktiven Modellnamen vom Backend */
+/** Lädt die verfügbaren Modelle vom Backend und baut das Dropdown auf */
 async function loadModels() {
     try {
         const res = await fetch(`${API_BASE}/api/models`);
@@ -36,12 +37,59 @@ async function loadModels() {
         currentModelId = data.current;
         const selected = data.models.find(m => m.id === data.current);
         if (selected && modelPillLabel) {
-            modelPillLabel.textContent = selected.name.replace('Gemini ', '');
+            modelPillLabel.textContent = selected.name.replace('Gemini ', '') + ' ▾';
         }
+        renderModelDropdown(data.models, data.current);
     } catch {
         if (modelPillLabel) modelPillLabel.textContent = 'Offline';
     }
 }
+
+/** Erzeugt die Optionen im Dropdown-Menü */
+function renderModelDropdown(models, activeId) {
+    if (!modelDropdown) return;
+    modelDropdown.innerHTML = '';
+    models.forEach(m => {
+        const option = document.createElement('div');
+        option.className = 'model-option' + (m.id === activeId ? ' active' : '');
+        option.innerHTML = `<span class="model-option-name">${m.name}</span>`
+                         + `<span class="model-option-desc">${m.description}</span>`;
+        option.addEventListener('click', () => switchModelUI(m.id, m.name, models));
+        modelDropdown.appendChild(option);
+    });
+}
+
+/** Wechselt das Modell per PUT-Request und aktualisiert das UI */
+async function switchModelUI(modelId, modelName, models) {
+    try {
+        const res = await fetch(`${API_BASE}/api/models`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ modelId }),
+        });
+        const data = await res.json();
+        if (data.current) {
+            currentModelId = data.current;
+            if (modelPillLabel) modelPillLabel.textContent = modelName.replace('Gemini ', '') + ' ▾';
+            renderModelDropdown(models, data.current);
+            showToast(`Modell gewechselt: ${modelName}`);
+        }
+    } catch {
+        showToast('Modellwechsel fehlgeschlagen.', 'error');
+    }
+    modelDropdown?.classList.remove('open');
+}
+
+// Dropdown öffnen / schließen
+modelPillLabel?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    modelDropdown?.classList.toggle('open');
+});
+
+// Dropdown schließen wenn außerhalb geklickt wird
+document.addEventListener('click', () => {
+    modelDropdown?.classList.remove('open');
+});
 
 // Modellname beim Seitenstart laden
 loadModels();

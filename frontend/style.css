@@ -466,6 +466,11 @@ button.primary-btn:hover {
     flex-shrink: 0;
 }
 
+.model-selector {
+    position: relative;
+    flex-shrink: 0;
+}
+
 .model-label {
     display: inline-flex;
     align-items: center;
@@ -482,6 +487,68 @@ button.primary-btn:hover {
     font-weight: bold;
     flex-shrink: 0;
     text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.model-label:hover {
+    border-color: var(--primary);
+    background: var(--bg);
+}
+
+.model-dropdown {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    overflow: hidden;
+}
+
+.model-dropdown.open {
+    display: block;
+}
+
+.model-option {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    border-bottom: 1px solid var(--border);
+}
+
+.model-option:last-child {
+    border-bottom: none;
+}
+
+.model-option:hover {
+    background-color: var(--bg);
+}
+
+.model-option.active {
+    background-color: rgba(233, 150, 35, 0.1);
+}
+
+.model-option-name {
+    font-weight: 700;
+    font-size: 0.88em;
+    color: var(--text);
+}
+
+.model-option.active .model-option-name {
+    color: var(--primary);
+}
+
+.model-option-desc {
+    font-size: 0.75em;
+    color: var(--text-muted, #888);
+    margin-top: 2px;
 }
 
 .send-btn {
@@ -1173,6 +1240,9 @@ body.dark-mode .msg-error {
     .model-label {
         font-size: 0.72em;
         padding: 4px 8px;
+    }
+    .model-dropdown {
+        min-width: 180px;
     }
     .send-btn {
         width: 34px;

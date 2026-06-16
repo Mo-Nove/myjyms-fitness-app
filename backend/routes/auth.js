@@ -32,7 +32,7 @@ router.post('/login', (req, res) => {
     const payload = { id: user.id, user: user.username, role: user.role };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-    sendResponse(req, res, { message: 'Login erfolgreich!', token });
+    sendResponse(req, res, { message: 'Login erfolgreich!', token, userId: user.id });
 });
 
 module.exports = router;

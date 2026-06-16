@@ -171,8 +171,14 @@ if (btnSaveProfile) {
             return;
         }
 
+        const userId = sessionStorage.getItem('myjyms_userId');
+        if (!userId) {
+            showToast('Bitte melde dich zuerst an.', 'error');
+            return;
+        }
+
         try {
-            const response = await fetch(`${API_BASE}/api/users/1`, {
+            const response = await fetch(`${API_BASE}/api/users/${userId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),

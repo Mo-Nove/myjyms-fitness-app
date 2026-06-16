@@ -45,8 +45,9 @@ if (btnLogin) {
             const data = await response.json();
 
             if (response.ok) {
-                // Token sicher im sessionStorage speichern
+                // Token und User-ID sicher im sessionStorage speichern
                 sessionStorage.setItem('myjyms_token', data.token);
+                sessionStorage.setItem('myjyms_userId', data.userId);
                 loginOverlay.style.display = 'none';
                 loginError.style.display = 'none';
             } else {

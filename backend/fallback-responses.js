@@ -98,7 +98,7 @@ const WOCHENPLAENE = {
 
 const CHAT_RESPONSES = [
     'Hier sind ein paar allgemeine Trainingstipps:\n\n1. **Aufwärmen** – Immer 5–10 Min. vor dem Training.\n2. **Progressive Overload** – Steigere regelmäßig Gewicht oder Wiederholungen.\n3. **Regeneration** – Mindestens 48h Pause pro Muskelgruppe.\n4. **Ernährung** – Genügend Protein (1,6–2,2g pro kg Körpergewicht).\n5. **Schlaf** – 7–9 Stunden für optimale Regeneration.\n\n> 💡 Konsistenz schlägt Perfektion – bleib dran!',
-    'Gute Frage! Hier ein paar Grundregeln:\n\n- **Trainiere 3–5× pro Woche** – Qualität vor Quantität.\n- **Compound-Übungen zuerst** – Kniebeugen, Bankdrücken, Kreuzheben.\n- **Genug trinken** – Mindestens 2–3 Liter Wasser am Tag.\n- **Tracke deinen Fortschritt** – Was du misst, kannst du verbessern.\n\n> Klicke auf die Muskel-Figur, um gezielte Übungsempfehlungen zu bekommen! 💪',
+    'Hier ein paar Grundregeln:\n\n- **Trainiere 3–5× pro Woche** – Qualität vor Quantität.\n- **Compound-Übungen zuerst** – Kniebeugen, Bankdrücken, Kreuzheben.\n- **Genug trinken** – Mindestens 2–3 Liter Wasser am Tag.\n- **Tracke deinen Fortschritt** – Was du misst, kannst du verbessern.\n\n> Klicke auf die Muskel-Figur, um gezielte Übungsempfehlungen zu bekommen! 💪',
     'Trainingstipps für dich:\n\n1. **Richtige Form** geht immer vor schwerem Gewicht.\n2. **Mind-Muscle-Connection** – Spüre den Zielmuskel bei jeder Wiederholung.\n3. **Ruhetage sind Pflicht** – Muskeln wachsen in der Erholung!\n4. **Ernährung macht 70%** – Du kannst ein schlechtes Training nachholen, aber nicht schlechte Ernährung.\n\n> 💡 Tipp: Nutze die Muskel-Figur, um Übungen für bestimmte Körperteile zu finden!',
 ];
 
