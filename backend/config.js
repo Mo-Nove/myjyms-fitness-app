@@ -16,7 +16,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 // ── Server ──────────────────────────────────────────────────
 
 const PORT = 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'mein_super_geheimes_passwort';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // ── Google Gemini KI (Externe API 1) ────────────────────────
 
